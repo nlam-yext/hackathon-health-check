@@ -30,6 +30,13 @@
         stroke: var(--gauge-color);
         transition: stroke-dashoffset 0.5s ease-in-out;
     }
+    .c-table {
+      text-align: left;
+    }
+    #risk-table th {
+      background-color: #f8f9f9;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -46,10 +53,92 @@
     <p class="u-fs-md" style="color: var(--gauge-color);">High Risk</p>
   </div>
 
+  <div class="c-table">
+    <table id="risk-table" class="c-table c-table--striped">
+      <thead>
+        <tr>
+          <th>Factor</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td colspan="2" style="text-align:center;">Loading...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
   <script>
     var client = ZAFClient.init();
-    client.invoke('resize', { width: '100%', height: '220px' });
+    client.invoke('resize', { width: '100%', height: '350px' });
+
+    client.get('ticket.requester.id').then(
+      function(data) {
+        var user_id = data['ticket.requester.id'];
+	console.log('Requester id is ' + user_id);
+      }
+    );
+
+    function fetchRiskFactors() {
+      // In a real app, you would get the user ID dynamically
+      // client.get('user.id').then(data => { ... });
+      const userId = 12345;
+
+      const options = {
+        url: `https://api.example.com/risk_factors/${userId}`,
+        type: 'GET',
+        cors: true, // Required for cross-domain requests
+        dataType: 'json'
+      };
+
+      // client.request(options).then(
+      //   function(response) {
+      //     populateTable(response.risk_factors);
+      //   },
+      //   function(error) {
+      //     handleTableError(error);
+      //   }
+      // );
+      
+      // For this example, we'll simulate a successful API response
+      const exampleResponse = {
+        "risk_factors": [
+          { "factor": "High Ticket Volume", "detail": "5 tickets in last 7 days" },
+          { "factor": "Negative CSAT", "detail": "Score of 2/5 on last survey" },
+          { "factor": "Pending Renewal", "detail": "Subscription renews in <30 days" }
+        ]
+      };
+      populateTable(exampleResponse.risk_factors);
+    }
+
+    function populateTable(factors) {
+      const tableBody = document.querySelector("#risk-table tbody");
+      // Clear loading state
+      tableBody.innerHTML = ''; 
+
+      if (factors && factors.length > 0) {
+        factors.forEach(item => {
+          let row = tableBody.insertRow();
+          let factorCell = row.insertCell(0);
+          let detailCell = row.insertCell(1);
+          factorCell.textContent = item.factor;
+          detailCell.textContent = item.detail;
+        });
+      } else {
+        tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No risk factors found.</td></tr>';
+      }
+    }
+
+    function handleTableError(error) {
+      const tableBody = document.querySelector("#risk-table tbody");
+      tableBody.innerHTML = '<tr><td colspan="2" style="text-align:center; color:red;">Could not load data.</td></tr>';
+      console.error(error);
+    }
+
+    // Fetch data when the app loads
+    fetchRiskFactors();
 
     function setGauge(score) {
       const root = document.documentElement;
