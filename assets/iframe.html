@@ -4,63 +4,90 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@zendeskgarden/css-bedrock@8.0/dist/index.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@zendeskgarden/css-utilities@4.0/dist/index.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@zendeskgarden/css-tags@8.0/dist/index.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@zendeskgarden/css-alerts@8.0/dist/index.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@zendeskgarden/css-forms@8.0/dist/index.css">
   <style>
-    body { padding: 16px; }
-    .c-tag { margin-left: 8px; }
-    .u-mb-sm { margin-bottom: 4px; }
-    .u-mb-lg { margin-bottom: 16px; }
-    .section-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
+    :root {
+      --gauge-color: #d94f4f; /* This will be set by JS */
+    }
+    body {
+      padding: 16px;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .gauge-container {
+      width: 200px;
+      height: 100px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .gauge-value {
+      margin-top: -65px; /* Adjust to position text over the SVG */
+      position: relative;
+    }
+    #gauge-track {
+        stroke: #e6e6e6;
+    }
+    #gauge-fill {
+        stroke: var(--gauge-color);
+        transition: stroke-dashoffset 0.5s ease-in-out;
     }
   </style>
 </head>
 <body>
 
-  <div class="u-mb-lg">
-    <div class="section-header">
-      <h2 class="u-semibold u-fs-lg">Client Health</h2>
-      <span class="c-tag c-tag--red">High Risk</span>
-    </div>
-    <div class="c-alert c-alert--error u-mb-sm">
-      <div class="c-alert__content">This client's subscription is up for renewal in 2 weeks.</div>
-    </div>
-    <p class="u-fs-sm u-mb-sm">Client has a history of recent critical tickets and is on a legacy plan.</p>
-    <label class="c-label u-mb-sm">Risk Score: 85/100</label>
-    <div class="c-range">
-        <input type="range" class="c-range__input is-disabled" value="85" min="0" max="100" disabled>
-    </div>
+  <div class="gauge-container">
+    <svg viewBox="0 0 100 56" class="gauge-svg">
+      <path id="gauge-track" d="M 5 50 A 40 40 0 0 1 95 50" stroke-width="10" fill="none"/>
+      <path id="gauge-fill" d="M 5 50 A 40 40 0 0 1 95 50" stroke-width="10" fill="none"/>
+    </svg>
   </div>
 
-  <div class="u-mb-lg">
-    <div class="section-header">
-      <h2 class="u-semibold u-fs-lg">Ticket Health</h2>
-      <span class="c-tag c-tag--yellow">Medium</span>
-    </div>
-    <p class="u-fs-sm u-mb-sm">This ticket has been reassigned once and is approaching its SLA warning time.</p>
-    <label class="c-label u-mb-sm">Urgency Score: 62/100</label>
-    <div class="c-range">
-        <input type="range" class="c-range__input is-disabled" value="62" min="0" max="100" disabled>
-    </div>
-  </div>
-
-  <div>
-    <h2 class="u-semibold u-fs-lg u-mb-sm">Suggested Actions</h2>
-    <ul class="u-list u-list--dashed">
-      <li class="u-fs-sm"><a class="c-link" href="#">View full client journey</a></li>
-      <li class="u-fs-sm"><a class="c-link" href="#">Apply 'At-Risk Client' macro</a></li>
-      <li class="u-fs-sm"><a class="c-link" href="#">Escalate to account manager</a></li>
-    </ul>
+  <div class="gauge-value">
+    <p class="u-fs-xxl u-semibold u-mb-0"><span class="score-text">85</span><span class="u-fs-lg">/100</span></p>
+    <p class="u-fs-md" style="color: var(--gauge-color);">High Risk</p>
   </div>
 
   <script src="https://static.zdassets.com/zendesk_app_framework_sdk/2.0/zaf_sdk.min.js"></script>
   <script>
     var client = ZAFClient.init();
-    client.invoke('resize', { width: '100%', height: '420px' });
+    client.invoke('resize', { width: '100%', height: '220px' });
+
+    function setGauge(score) {
+      const root = document.documentElement;
+      const riskText = document.querySelector('.u-fs-md');
+      const scoreText = document.querySelector('.score-text');
+      const gaugeFill = document.getElementById('gauge-fill');
+      const radius = 40;
+      const circumference = radius * Math.PI;
+
+      // Clamp score between 0 and 100
+      const clampedScore = Math.max(0, Math.min(100, score));
+      
+      // Calculate the offset to "hide" the part of the stroke we don't want
+      const offset = circumference - (clampedScore / 100) * circumference;
+      
+      gaugeFill.style.strokeDasharray = circumference;
+      gaugeFill.style.strokeDashoffset = offset;
+      
+      scoreText.textContent = clampedScore;
+
+      let color = '#57946C'; // Green
+      let risk = 'Low Risk';
+      if (clampedScore > 50) {
+        color = '#f5a723'; // Yellow
+        risk = 'Medium Risk';
+      }
+      if (clampedScore > 75) {
+        color = '#d94f4f'; // Red
+        risk = 'High Risk';
+      }
+      
+      root.style.setProperty('--gauge-color', color);
+      riskText.style.color = color;
+      riskText.textContent = risk;
+    }
+
+    // Set the initial score
+    setGauge(45);
   </script>
 </body>
 </html>
