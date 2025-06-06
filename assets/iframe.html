@@ -90,24 +90,24 @@
 						dataType: 'json'
 					};
 
-					client.request(options).then(
-					  function(response) {
-					    populateTable(response.risk_factors);
-					  },
-					  function(error) {
-					    handleTableError(error);
-					  }
-					);
+					//client.request(options).then(
+					//  function(response) {
+					//    populateTable(response.risk_factors);
+					//  },
+					//  function(error) {
+					//    handleTableError(error);
+					//  }
+					//);
 
 					// For this example, we'll simulate a successful API response
-					//const exampleResponse = {
-					//	"risk_factors": [
-					//		{ "factor": "High Ticket Volume", "detail": "5 tickets in last 7 days" },
-					//		{ "factor": "Negative CSAT", "detail": "Score of 2/5 on last survey" },
-					//		{ "factor": "Pending Renewal", "detail": "Subscription renews in <30 days" }
-					//	]
-					//};
-					//populateTable(exampleResponse.risk_factors);
+					const exampleResponse = {
+						"risk_factors": [
+							{ "factor": "AVG_LIVE_PERCENT", "detail": "92.4" },
+							{ "factor": "AVG_NOTSYNCED_PERCENT", "detail": "2.8" },
+							{ "factor": "AVG_PROCESSING_PERCENT", "detail": "4.8" }
+						]
+					};
+					populateTable(exampleResponse.risk_factors);
 				}
 
 				function populateTable(factors) {
@@ -173,7 +173,7 @@
 				}
 
 				// Set the initial score
-				setGauge(45);
+				setGauge(8);
 		</script>
 	</body>
 </html>
