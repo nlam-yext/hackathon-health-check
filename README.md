@@ -23,4 +23,4 @@ When an agent views a ticket, the Risk Predictor app fetches the associated cust
 
 1.  Make sure you have the Zendesk Command Line Interface (ZCLI) installed.
 2.  Run the app locally in your Zendesk instance using `zcli apps:server`.
-3.  The app's frontend is located in `assets/iframe.html`. All logic is contained within this file for simplicity.put your screenshots down here.]
+3.  The app's frontend is located in `assets/iframe.html`. All logic is contained within this file for simplicity.
