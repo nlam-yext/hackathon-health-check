@@ -1,7 +1,7 @@
 {
-  "name": "Health Check",
+  "name": "Client Risk Predictor",
   "author": {
-    "name": "Our Good Team",
+    "name": "Team Four Sight",
     "email": "ametzger@yext.com"
   },
   "defaultLocale": "en",
